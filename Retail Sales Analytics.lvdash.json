@@ -1,0 +1,343 @@
+{
+  "datasets": [
+    {
+      "name": "375d686f",
+      "displayName": "monthly_revenue",
+      "queryLines": [
+        "SELECT invoice_month, country, total_revenue,\r\n",
+        "       num_invoices, unique_customers\r\n",
+        "FROM   default.gold_monthly_revenue\r\n",
+        "WHERE  country IN ('United Kingdom','Germany','France',\r\n",
+        "                   'Netherlands','Australia')\r\n",
+        "ORDER BY invoice_month"
+      ],
+      "catalog": "workspace",
+      "schema": "default"
+    },
+    {
+      "name": "b55bd0e3",
+      "displayName": "top_products",
+      "queryLines": [
+        "SELECT description, total_revenue, units_sold, num_orders\r\n",
+        "FROM   default.gold_top_products\r\n",
+        "ORDER BY total_revenue DESC\r\n",
+        "LIMIT 20"
+      ]
+    },
+    {
+      "name": "6f810160",
+      "displayName": "customer_segments",
+      "queryLines": [
+        "SELECT segment,\r\n",
+        "       COUNT(*) AS num_customers,\r\n",
+        "       ROUND(AVG(monetary_value), 2) AS avg_spend,\r\n",
+        "       ROUND(SUM(monetary_value), 2) AS total_spend\r\n",
+        "FROM   default.gold_customer_rfm\r\n",
+        "GROUP BY segment\r\n",
+        "ORDER BY total_spend DESC"
+      ]
+    },
+    {
+      "name": "5b50e9b1",
+      "displayName": "dow_sales",
+      "queryLines": [
+        "SELECT day_name, total_revenue, num_invoices\r\n",
+        "FROM   default.gold_dow_sales\r\n",
+        "ORDER BY day_of_week"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "74d7fcf1",
+      "displayName": "Retail Sales Analytics",
+      "layout": [
+        {
+          "widget": {
+            "name": "0eb9d88f",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "375d686f",
+                  "fields": [
+                    {
+                      "name": "country",
+                      "expression": "`country`"
+                    },
+                    {
+                      "name": "invoice_month",
+                      "expression": "`invoice_month`"
+                    },
+                    {
+                      "name": "total_revenue",
+                      "expression": "`total_revenue`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Revenue by Month",
+                "showTitle": true
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "invoice_month",
+                  "displayName": "Month",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "total_revenue",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    },
+                    "abbreviation": "compact"
+                  },
+                  "displayName": "Total Revenue",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "country",
+                  "displayName": "Country",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 6,
+            "height": 12
+          }
+        },
+        {
+          "widget": {
+            "name": "c0985ec5",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "b55bd0e3",
+                  "fields": [
+                    {
+                      "name": "total_revenue",
+                      "expression": "`total_revenue`"
+                    },
+                    {
+                      "name": "description",
+                      "expression": "`description`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Top 20 Products by Revenue",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "total_revenue",
+                  "displayName": "Total Revenue",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "description",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    },
+                    "abbreviation": "compact"
+                  },
+                  "displayName": "Product",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 6,
+            "height": 12
+          }
+        },
+        {
+          "widget": {
+            "name": "customer-segments-distribution",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "6f810160",
+                  "fields": [
+                    {
+                      "name": "sum(num_customers)",
+                      "expression": "SUM(`num_customers`)"
+                    },
+                    {
+                      "name": "segment",
+                      "expression": "`segment`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Customer Segments Distribution",
+                "showTitle": true
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(num_customers)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "segment",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "fe43db5c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "5b50e9b1",
+                  "fields": [
+                    {
+                      "name": "day_name",
+                      "expression": "`day_name`"
+                    },
+                    {
+                      "name": "total_revenue",
+                      "expression": "`total_revenue`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Sales by Day of Week",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "day_name",
+                  "displayName": "Day",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "total_revenue",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 0
+                    },
+                    "abbreviation": "compact"
+                  },
+                  "displayName": "Total Revenue",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 13,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "847e5da2",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"text-align:center;display:block;\"><span style=\"font-size: 20px;\">**RETAIL SALES ANALYTICS**</span></span>"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
